@@ -41,20 +41,20 @@ class AcalTestClass(object):
     # Navigate to date override page, put in our custom date
     def setDate(self, date):
         self.driver.get(self.datesPage)
-        time.sleep(.5)
+        time.sleep(.2)
         e = self.driver.find_element_by_xpath('//input[@name="date"]')
         e.send_keys(date + '\n')
-        time.sleep(.5)
+        time.sleep(.2)
         self.dateStr = date
 
     # Navigate to user override page, set username
     def setUser(self, user):
         driver = self.driver
         driver.get(self.userPage)
-        time.sleep(.5)
+        time.sleep(.2)
         namebox = driver.find_element_by_name('override_as')
         namebox.send_keys(user + Keys.RETURN)
-        time.sleep(.5)
+        time.sleep(.2)
     
     # Navigate to landing page
     def browseLanding(self):
@@ -80,8 +80,8 @@ class AcalTestClass(object):
         if event.span:
             dateEvent = event.dateBegin
             dateCurrent = self.dateTime
-            if event.dateEnd < dateCurrent:
-                self.fail('Event %s occured in the past' %event.label)
+            if self.isDatePast(event.dateEnd):
+                self.fail('%s occured in the past (now is %s)' %(event, dateCurrent))
             if dateEvent > dateCurrent: 
                 return dateEvent
             else:
@@ -92,10 +92,26 @@ class AcalTestClass(object):
             dateEvent = event.dateBegin
             dateCurrent = self.dateTime
 
-            if dateEvent < dateCurrent:
-                self.fail('Event %s occured in the past' %event.label)
+            if self.isDatePast(dateEvent):
+                self.fail('%s occured in the past (now is %s)' %(event, dateCurrent))
             else:
                 return dateEvent
+
+    # Take a guess as to whether a date is actually in the past, 
+    # and not just year-span confusion
+    def isDatePast(self, date):
+        curDate = self.dateTime
+        newDate = date
+
+        if newDate >= curDate:
+            return False
+        else:
+            delta = newDate - curDate
+            # Use 200 days in the past as our threshold
+            if delta.days < -200:
+                return False
+            else:
+                return True
 
         
 
@@ -123,6 +139,8 @@ class calEvent(object):
                 beginParts = dateBegin.split(' ')
                 month = beginParts[0]
                 self.dateEnd = datetime.datetime.strptime(month + dateEnd + str(defyear), '%b%d%Y')
+            if self.dateEnd < self.dateBegin:
+                self.dateEnd = self.dateEnd.replace(year = self.dateEnd.year + 1)
                 
         # Handle non-spanning events
         elif len(dateSplit) == 1:
@@ -139,6 +157,14 @@ class calEvent(object):
         labelElement = e.find_element_by_tag_name('a')
         self.label = labelElement.text
         self.url = labelElement.get_attribute('href')
+
+    def __str__(self):
+        if self.span:
+            return 'Span %s to %s "%s"' %(self.dateBegin, self.dateEnd, self.label)
+        else:
+            return 'Event %s "%s"' %(self.dateBegin, self.label)
+
+    __repr__ = __str__
 
 # Get all calendar events on the current page, return an list of them
 # as calEvent instances
@@ -167,11 +193,18 @@ c = calScenario
 # List of scenarios
 # To define a new date to test at, put it here
 dates = [
+    c('javerage', '2013-01-02'),
+    c('javerage', '2013-01-15'),
     c('javerage', '2013-04-15'),
+    c('javerage', '2013-04-25'),
     c('javerage', '2013-05-30'),
     #c('javerage', ''),
     #c('javerage', ''),
     c('javerage', '2013-07-25'),
+    c('javerage', '2013-12-12'),
+    c('javerage', '2013-12-16'),
+    # This one fails, guess the date is too far forward
+    #c('javerage', '2013-12-24'), 
     #c('javerage', ''),
 ]
 
