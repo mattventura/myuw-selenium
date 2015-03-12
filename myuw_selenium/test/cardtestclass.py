@@ -7,18 +7,18 @@ import time
 # URL suffixes
 datePageSuffix = '/mobile/admin/dates/'
 landingSuffix = '/mobile/landing/'
-userSuffix = '/support'
+userSuffix = '/users/'
 
 # The user that it will default to
 # We don't override the user except when necessary
-currentUser = 'javerage'
+currentUser = ''
 
 # Other tests should sublcass this as its first superclass, as well
 # as SeleniumLiveServerTestCase
 class co_test():
     
     # Default username
-    user = currentUser
+    #user = 'javerage'
 
     # Setup function. Calls SeleniumLiveServerTestCase so that it can do its
     # thing despite being overridden here. 
@@ -32,6 +32,7 @@ class co_test():
         self.userPage = url + userSuffix
         self.dateObj = datetime.datetime.strptime(self.date, '%Y-%m-%d')
 
+        # Pick the card library for our user
         self.cardLibrary = cardLibrary[self.user]
 
         # Set the correct username and date, then go to the landing
@@ -50,7 +51,7 @@ class co_test():
     def chgUser(self, user):
         self.driver.get(self.userPage)
         time.sleep(.2)
-        namebox = driver.find_element_by_xpath('//input[@name="override_as"]')
+        namebox = self.driver.find_element_by_xpath('//input[@name="override_as"]')
         namebox.send_keys(user + '\n')
         time.sleep(.2)
 
@@ -59,6 +60,7 @@ class co_test():
     def setToDate(self):
         self.setDate(self.date)
 
+    # Set date to given date
     def setDate(self, date):
         self.driver.get(self.datesPage)
         time.sleep(.2)
@@ -67,16 +69,19 @@ class co_test():
         time.sleep(.2)
         self.dateSet = True
 
+    # Browse the landing page
     def browseLanding(self):
         self.driver.get(self.landingPage)
 
     # Actually test our card display
     def test_card_order(self):
+        #self.fail('blah')
         self.setToDate()
         self.browseLanding()
         self._testCards()
 
 
+    # Test the cards currently on the page
     def _testCards(self):
         # Get all cards
         cards = self.driver.find_elements_by_xpath('//div[@id="landing_content"]/div')
