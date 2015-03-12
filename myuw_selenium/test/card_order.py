@@ -8,6 +8,8 @@ class CardOrderTest(SeleniumLiveServerTestCase):
 
     def test_card_order(self):
         from time import sleep
+        # Allow longer failure messages
+        self.maxDiff = None
 
         dates = [
             { 'date': "2013-04-07", 'user': 'none' }, # Needs to be none to have no registrations, otherwise RegStatusCard is hidden
@@ -20,6 +22,7 @@ class CardOrderTest(SeleniumLiveServerTestCase):
             { 'date': "2013-05-30", 'user': 'none' }, # Same!
             { 'date': "2013-03-10", 'user': 'none' }, # Need to go back in time, otherwise autumn makes this break - Same though
             { 'date': "2013-03-11", 'user': 'none' }, # Need to go back in time, otherwise autumn makes this break
+
             { 'date': "2013-04-01", 'user': 'javerage' },
             { 'date': "2013-04-02", 'user': 'javerage' }, # Same!
             { 'date': "2013-04-03", 'user': 'javerage' }, # Future quarter moves to position 1
@@ -36,42 +39,53 @@ class CardOrderTest(SeleniumLiveServerTestCase):
         ]
 
         correct_cards = [
-            [u'VisualScheduleCard', u'CourseCard', u'TuitionCard'], #  'date': "2013-04-07", 'user': 'none'
-            [u'SummerRegStatusCardA', u'VisualScheduleCard', u'CourseCard', u'TuitionCard'],
-            [u'SummerRegStatusCardA', u'VisualScheduleCard', u'CourseCard', u'TuitionCard'],
-            [u'VisualScheduleCard', u'CourseCard', u'TuitionCard', u'SummerRegStatusCard1'],
-            [u'VisualScheduleCard', u'CourseCard', u'TuitionCard', u'SummerRegStatusCard1'],
-            [u'RegStatusCard', u'VisualScheduleCard', u'CourseCard', u'TuitionCard', u'SummerRegStatusCard1'],
-            [u'RegStatusCard', u'VisualScheduleCard', u'CourseCard', u'TuitionCard', u'SummerRegStatusCard1'], #  'date': "2013-04-29", 'user': 'none'
-            [u'RegStatusCard', u'VisualScheduleCard', u'CourseCard', u'TuitionCard'],
-            [u'RegStatusCard', u'VisualScheduleCard', u'CourseCard', u'TuitionCard'],
-            [u'VisualScheduleCard', u'CourseCard', u'TuitionCard'],
+            ['VisualScheduleCard', 'CourseCard', 'TuitionCard'], #  'date': "2013-04-07", 'user': 'none'
+            ['SummerRegStatusCardA', 'VisualScheduleCard', 'CourseCard', 'TuitionCard'],
+            ['SummerRegStatusCardA', 'VisualScheduleCard', 'CourseCard', 'TuitionCard'],
+            ['VisualScheduleCard', 'CourseCard', 'TuitionCard', 'SummerRegStatusCard1'],
+            ['VisualScheduleCard', 'CourseCard', 'TuitionCard', 'SummerRegStatusCard1'],
+            ['RegStatusCard', 'VisualScheduleCard', 'CourseCard', 'TuitionCard', 'SummerRegStatusCard1'],
+            ['RegStatusCard', 'VisualScheduleCard', 'CourseCard', 'TuitionCard', 'SummerRegStatusCard1'], #  'date': "2013-04-29", 'user': 'none'
+            ['RegStatusCard', 'VisualScheduleCard', 'CourseCard', 'TuitionCard'],
+            ['RegStatusCard', 'VisualScheduleCard', 'CourseCard', 'TuitionCard'],
+            ['VisualScheduleCard', 'CourseCard', 'TuitionCard'],
 
-            [u'FutureQuarterCardA', u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard'],
-            [u'FutureQuarterCardA', u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard'],
-            [u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
+            ['FutureQuarterCardA', 'VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard'],
+            ['FutureQuarterCardA', 'VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard'],
+            ['VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['VisualScheduleCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
 
-            [u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'GradeCard', u'FinalExamCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'GradeCard', u'FinalExamCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'GradeCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'GradeCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard', u'AcademicCard', 'FutureQuarterCard1'],
-            [u'GradeCard', u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard'],
-            [u'GradeCard', u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard'],
-            [u'VisualScheduleCard', u'CourseCard', u'HFSCard', u'TuitionCard', u'LibraryCard'],
+            ['VisualScheduleCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['FinalExamCard', 'GradeCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['FinalExamCard', 'GradeCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['GradeCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['GradeCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard', 'AcademicCard', 'FutureQuarterCard1'],
+            ['GradeCard', 'VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard'],
+            ['GradeCard', 'VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard'],
+            ['VisualScheduleCard', 'TextbookCard', 'CourseCard', 'HFSCard', 'TuitionCard', 'LibraryCard'],
         ]
 
+        # Not technically needed to make the tests pass, but cleans
+        # up the failure messages a bit. 
+        for l in correct_cards:
+            for i in range(len(l)):
+                l[i] = unicode(l[i])
+                
+
         index = 0
+        curUser = ''
         for val in dates:
             date = val["date"]
             user = val["user"]
 
-            self.driver.get(self.live_server_url + '/users/')
-            element = self.driver.find_element_by_xpath("//input[@name='override_as']")
-            element.clear()
-            element.send_keys(user)
-            element.submit()
+            # Only switch users if necessary, saves a bit of time. 
+            if user != curUser:
+                self.driver.get(self.live_server_url + '/users/')
+                element = self.driver.find_element_by_xpath("//input[@name='override_as']")
+                element.clear()
+                element.send_keys(user)
+                element.submit()
+                curUser = user
 
             self.driver.get(self.live_server_url + '/mobile/admin/dates/')
             element = self.driver.find_element_by_xpath("//input[@name='date']")
@@ -93,9 +107,7 @@ class CardOrderTest(SeleniumLiveServerTestCase):
 
             cards = correct_cards[index]
 
-            self.assertEquals(len(cards), len(displayed), "Set %s has right number of cards (%s, %s)" % (index, ",".join(cards), ",".join(displayed)))
-
-            for i in range(0, len(cards)-1):
-                self.assertEquals(cards[i], displayed[i], "Set %s has correct card %s" % (index, i))
+            # Use this instead of checking for same length then checking each element
+            self.assertEqual(cards, displayed, 'Incorrect set of cards on date %s' %date)
 
             index = index + 1
