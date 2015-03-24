@@ -78,7 +78,10 @@ class co_test():
         #self.fail('blah')
         self.setToDate()
         self.browseLanding()
-        self._testCards()
+        failText = self._testCards()
+        if failText:
+            self.fail()
+
 
 
     # Test the cards currently on the page
@@ -97,7 +100,7 @@ class co_test():
                 # Card ID wasn't found in our library of cards
                 # This is either a new card, a card with its ID changed, 
                 # or a card that hasn't been programmed for yet. 
-                print('Unknown card %s' %cardName)
+                print('Unknown card %s. If it is a new card, you should add it to cards.py' %cardName)
                 continue
 
             # Is the card displayed: Actual value
@@ -107,11 +110,13 @@ class co_test():
 
             # Check that the card is displayed iff it should be displayed
             if isDisplayed != expDisplayed:
+                isDisplayedText = 'Displayed' if isDisplayed else 'Hidden'
+                expDisplayedText = 'Displayed' if expDisplayed else 'Hidden'
                 failText += 'Card %s (actual: %s, expected: %s)\n' %(cardName, isDisplayed, expDisplayed)
 
         if failText:
             failText = 'The following cards had issues on date %s: \n' %self.date + failText
-            self.fail(failText)
+            return failText
 
 
 

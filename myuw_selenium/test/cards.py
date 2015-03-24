@@ -4,8 +4,13 @@ from myuw_selenium.test.cardclasses import card, cardCD, cardN
 from cardclasses import *
 
 
+# Specfify dates to test here
+# In addition, days immediately before and after a card is supposed 
+# to show or hide will automatically be added. 
+# Dates before minDate will not automatically be added. 
+minDate = '2013-01-07'
 testDates = {}
-testDates['javerage'] = [
+testDates['javerage'] = set([
     '2013-01-07', # First day of winter quarter
     '2013-01-10', # Spring future quarter card should move to bottom
     '2013-01-15', # One week into quarter, plus one day
@@ -18,11 +23,12 @@ testDates['javerage'] = [
     '2013-03-23', # Day after spring break begins
     '2013-03-25', # Day before grade submission deadline
     '2013-03-26', # Grade submission deadline
-]
+])
 
 
 # Both start and end dates are inclusive
-cardList_javerage = [
+cardList = {}
+cardList['javerage'] = [
     card('HFSCard'),
     card('TuitionCard'),
     card('LibraryCard'),
@@ -32,7 +38,7 @@ cardList_javerage = [
     cardCD('VisualScheduleCard', ('2013-01-07', '2013-03-15')),
     cardCD('TextbookCard', ('2013-01-07', '2013-01-13')),
     cardCD('GradeCard', ('2013-03-16', '2013-03-26')),
-    cardCD('FinalExamCard', ('2013-03-16', '2013-03-21')),
+    cardCD('FinalExamCard', ('2013-03-16', '2013-03-22')),
     cardCD('FutureQuarterCardA', ('2013-01-07', '2013-03-26')),
     # This card has "seen"-dependent logic, so it never actually appears at the 
     # bottom for our tests
@@ -42,12 +48,30 @@ cardList_javerage = [
     cardN('RegStatusCard'), 
     cardN('SummerRegStatusCardA'),
     cardN('SummerRegStatusCard1'),
+    cardN('EventsCard'),
 
 ]
 
-cardList_none = []
+cardList['none'] = []
 
-
+# Convert lists to libraries (keys are card name, values are card object)
 cardLibrary = {}
-cardLibrary['javerage'] = cardListToDict(cardList_javerage)
-cardLibrary['none'] = cardListToDict(cardList_none)
+# This uses testDates instead of cardList so that we don't do unnecessary work
+# for users that we aren't actually going to test. 
+for userName in testDates:
+    cardLibrary[userName] = cardListToDict(cardList[userName])
+
+# Automatically add dates
+for userName in testDates:
+    cl = cardList[userName]
+    for card in cl:
+        if hasattr(card, 'ranges'):
+            for r in card.ranges:
+                for dateObj in (r.start, r.end):
+                    dayBefore = dateObj - datetime.timedelta(days = 1)
+                    dayStr = dateObj.strftime('%Y-%m-%d')
+                    dayBeforeStr = dayBefore.strftime('%Y-%m-%d')
+                    testDates[userName].add(dayStr)
+                    if dayBeforeStr >= minDate:
+                        testDates[userName].add(dayBeforeStr)
+
