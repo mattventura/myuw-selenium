@@ -38,7 +38,7 @@ cardList['javerage'] = [
     cardCD('VisualScheduleCard', ('2013-01-07', '2013-03-15')),
     cardCD('TextbookCard', ('2013-01-07', '2013-01-13')),
     cardCD('GradeCard', ('2013-03-16', '2013-03-26')),
-    cardCD('FinalExamCard', ('2013-03-16', '2013-03-22')),
+    cardCD('FinalExamCard', ('2013-03-16', '2013-03-21')),
     cardCD('FutureQuarterCardA', ('2013-01-07', '2013-03-26')),
     # This card has "seen"-dependent logic, so it never actually appears at the 
     # bottom for our tests
@@ -65,13 +65,8 @@ for userName in testDates:
 for userName in testDates:
     cl = cardList[userName]
     for card in cl:
-        if hasattr(card, 'ranges'):
-            for r in card.ranges:
-                for dateObj in (r.start, r.end):
-                    dayBefore = dateObj - datetime.timedelta(days = 1)
-                    dayStr = dateObj.strftime('%Y-%m-%d')
-                    dayBeforeStr = dayBefore.strftime('%Y-%m-%d')
-                    testDates[userName].add(dayStr)
-                    if dayBeforeStr >= minDate:
-                        testDates[userName].add(dayBeforeStr)
+        if hasattr(card, 'testDates'):
+            for d in card.testDates:
+                if d >= minDate:
+                    testDates[userName].add(d)
 

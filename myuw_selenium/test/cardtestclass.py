@@ -30,13 +30,14 @@ class co_test():
         self.datesPage = url + datePageSuffix
         self.landingPage = url + landingSuffix
         self.userPage = url + userSuffix
-        self.dateObj = datetime.datetime.strptime(self.date, '%Y-%m-%d')
 
         # Pick the card library for our user
         self.cardLibrary = cardLibrary[self.user]
 
         # Set the correct username and date, then go to the landing
         self.setUser()
+
+        
 
     # Override user to self.user, but only if we actually need to. 
     # If the desired username and current username are the same, we don't need
@@ -65,22 +66,28 @@ class co_test():
         self.driver.get(self.datesPage)
         time.sleep(.2)
         e = self.driver.find_element_by_xpath('//input[@name="date"]')
+        e.clear()
         e.send_keys(date + '\n')
         time.sleep(.2)
         self.dateSet = True
+        self.dateObj = datetime.datetime.strptime(self.date, '%Y-%m-%d')
 
     # Browse the landing page
     def browseLanding(self):
         self.driver.get(self.landingPage)
 
     # Actually test our card display
-    def test_card_order(self):
+    def test_card_order_all(self):
         #self.fail('blah')
-        self.setToDate()
-        self.browseLanding()
-        failText = self._testCards()
+        failText = ''
+        for date in self.dates:
+            self.date = date
+            self.setToDate()
+            self.browseLanding()
+            failText = failText + self._testCards()
+
         if failText:
-            self.fail()
+            self.fail(failText)
 
 
 
@@ -100,7 +107,7 @@ class co_test():
                 # Card ID wasn't found in our library of cards
                 # This is either a new card, a card with its ID changed, 
                 # or a card that hasn't been programmed for yet. 
-                print('Unknown card %s. If it is a new card, you should add it to cards.py' %cardName)
+                print('Unknown card %s. If it is a new card, you should add it to cards.py\n' %cardName)
                 continue
 
             # Is the card displayed: Actual value
@@ -112,11 +119,13 @@ class co_test():
             if isDisplayed != expDisplayed:
                 isDisplayedText = 'Displayed' if isDisplayed else 'Hidden'
                 expDisplayedText = 'Displayed' if expDisplayed else 'Hidden'
-                failText += 'Card %s (actual: %s, expected: %s)\n' %(cardName, isDisplayed, expDisplayed)
+                failText += 'Card %s (actual: %s, expected: %s)\n' %(cardName, isDisplayedText, expDisplayedText)
 
         if failText:
-            failText = 'The following cards had issues on date %s: \n' %self.date + failText
+            failText = ('The following cards had issues on date %s: \n' %self.date) + failText
             return failText
+        else:
+            return ''
 
 
 

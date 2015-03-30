@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import datetime
-from myuw_selenium.platforms import on_platforms, SeleniumLiveServerTestCase
 
 # There will be nested dictionaries
 # cardLibrary's keys will be usernames
@@ -77,7 +76,6 @@ class cardCD(card):
             raise ValueError('Expected list or tuple for "ranges" argument.')
                 
 
-
     def shouldBeDisplayed(self, date):
         return self.isInRange(date)
 
@@ -86,6 +84,18 @@ class cardCD(card):
             if r.isInRange(date):
                 return True
         return False
+
+    @property
+    def testDates(self):
+        dates = []
+        for r in self.ranges:
+            for dateObj in (r.start, r.end):
+                dayBefore = dateObj - datetime.timedelta(days = 1)
+                dayStr = dateObj.strftime('%Y-%m-%d')
+                dayBeforeStr = dayBefore.strftime('%Y-%m-%d')
+                dates.append(dayStr)
+                dates.append(dayBeforeStr)
+        return dates
 
 # A card that should never display
 class cardN(card):

@@ -9,13 +9,23 @@ from myuw_selenium.test.cardtestclass import co_test
 from myuw_selenium.test.cards import testDates
 
 # Generate test classes based off the above data
-for userName in testDates:
-    dates = testDates[userName]
-    for testDate in dates:
-        class testClass(co_test, SeleniumLiveServerTestCase):
-            date = testDate
-            user = userName
+for (userName, dates) in testDates.items():
+    # old
+    #for testDate in dates:
+        #class testClass(co_test, SeleniumLiveServerTestCase):
+        #    date = testDate
+        #    user = userName
 
-        testClass.__name__ = 'test_%s_%s' %(userName, testDate)
-        on_platforms()(testClass) 
-        del testClass
+        #testClass.__name__ = 'test_%s_%s' %(userName, testDate)
+        #on_platforms()(testClass) 
+        #del testClass
+    
+
+    # new, executes all tests for one user
+    class testClass(co_test, SeleniumLiveServerTestCase):
+        dates = dates
+        user = userName
+
+    testClass.__name__ = 'test_cardorder_%s' %userName
+    on_platforms()(testClass)
+    del testClass
